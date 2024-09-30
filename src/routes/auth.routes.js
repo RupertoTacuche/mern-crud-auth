@@ -4,6 +4,7 @@ import {
         login, 
         logout, 
         profile} from '../controlllers/auth.controller.js'
+        
 import {authRequired} from "../middlewares/validateToken.js"
 
 const router = Router()
