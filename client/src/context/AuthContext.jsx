@@ -1,5 +1,5 @@
 import {createContext, useState, useContext, useEffect} from 'react'
-import {registerRequest, loginRequest}  from '../api/auth'
+import {registerRequest, loginRequest, verifyTokenRequest}  from '../api/auth'
 import Cookies from 'js-cookie'
 
 export const AuthContext = createContext()
@@ -16,6 +16,7 @@ export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [errors, setErrors] = useState([])
+    const [loading, setLoading] = useState(true)
    
 
     const signup = async (user) =>  {
@@ -57,12 +58,35 @@ export const AuthProvider = ({children}) => {
     },[errors])
     
     useEffect(() => {
+    async function checkLogin ()  {
         const cookies = Cookies.get()
-        console.log(cookies)
 
-        if(cookies.token) {
-            console.log(cookies.token)
-        }
+        if(!cookies.token) {
+            setIsAuthenticated(false)
+            setLoading(false)
+            return setUser(null)
+        } // borro llave
+                       try {
+                           const res = await verifyTokenRequest(cookies.token)
+                           if(!res.data) {
+                            setIsAuthenticated(false)
+                            setLoading(false)
+                        
+                            return; 
+                           }
+                           setIsAuthenticated(true)
+                           setUser(res.data)
+                           setLoading(false)
+
+                       } catch (error) {
+                           console.log(error)
+                           setIsAuthenticated(false)
+                           setUser(null)
+                       }
+                    //aqui debo borrar la llave
+    }
+
+    checkLogin()
     },[])
 
     return (
@@ -70,6 +94,7 @@ export const AuthProvider = ({children}) => {
     value={{
             signup,
             signin,
+            loading,
             user,
             isAuthenticated,
             errors,
