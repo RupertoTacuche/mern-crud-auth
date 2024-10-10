@@ -21,6 +21,8 @@ function RegisterPage() {
         signup(values)  
     })
 
+    
+
   return (
     <div className = "bg-zinc-800 max-w-md p-10 rounded-md">
         {
